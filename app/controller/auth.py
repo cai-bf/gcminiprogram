@@ -19,7 +19,7 @@ def check_login():
 @bp.route('/login', methods=['POST'])
 def login():
     wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'],
-                      session=current_app.session_interface)
+                      session=current_app.wx_session)
     # wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'])
     js_code = request.form.get('jscode')
     if js_code is None:

@@ -19,6 +19,6 @@ def create_app(config_class=Config):
 
     app.redis = Redis.from_url(app.config['REDIS_URL'])
 
-    app.session_interface = RedisStorage(app.redis)
+    app.wx_session = RedisStorage(app.redis)
 
     return app
