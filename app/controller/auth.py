@@ -3,9 +3,6 @@ from flask import g, request, current_app, jsonify, abort
 from app.models import user
 from app.utils import auth
 from wechatpy import WeChatClient
-from wechatpy.session.redisstorage import RedisStorage
-
-session_interface = RedisStorage(current_app.redis)
 
 
 @bp.route('/check_login', methods=['GET'])
@@ -21,8 +18,9 @@ def check_login():
 
 @bp.route('/login', methods=['POST'])
 def login():
-    # wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'], session=session_interface)
-    wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'])
+    wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'],
+                      session=current_app.session_interface)
+    # wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'])
     js_code = request.form.get('jscode')
     if js_code is None:
         return '出错， 请重试', 401

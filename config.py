@@ -13,3 +13,4 @@ class Config(object):
     APPID = os.environ.get('APP_ID')
     APP_SECRET = os.environ.get('APP_SECRET')
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
