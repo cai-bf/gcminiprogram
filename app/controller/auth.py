@@ -41,7 +41,7 @@ def login():
 
 @bp.before_app_request
 def before_request():
-    if request.path == '/check_login' or request.path == 'login':
+    if request.path == '/check_login' or request.path == '/login':
         return
     token = request.headers.get('access_token')
     if token is None:
