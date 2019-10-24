@@ -4,9 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from redis import Redis
 from wechatpy.session.redisstorage import RedisStorage
+from flask_migrate import Migrate
 
 
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(config_class=Config):
@@ -14,6 +16,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from app.controller import bp
     app.register_blueprint(bp)
