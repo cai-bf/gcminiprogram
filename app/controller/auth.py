@@ -1,3 +1,4 @@
+# coding:utf-8
 from app.controller import bp
 from flask import g, request, current_app, jsonify, abort, make_response
 from app.models import user

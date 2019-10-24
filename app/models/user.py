@@ -1,3 +1,4 @@
+# coding:utf-8
 from app import db
 from sqlalchemy.dialects.mysql import TINYINT
 import datetime
