@@ -1,6 +1,6 @@
 # coding:utf-8
 from app.controller import bp
-from flask import g, request, current_app, jsonify, abort, make_response
+from flask import g, request, current_app, abort, make_response
 from app.models import user
 from app.utils import auth
 from wechatpy import WeChatClient
@@ -31,12 +31,16 @@ def login():
         u = user.check_user_by_openid(openid)
         if u is None:
             u = user.create_user(openid)
-        u = u.to_dict()
-        if 'openid' in u:
-            del u['openid']
-        return u
+        token = auth.encode_auth_token(u.id)
+        return {'access_token': token}
     except Exception as e:
         return {'errmsg': str(e)}, 401
+
+
+@bp.route('/user', methods=['GET'])
+def get_user():
+    u = g.current_user.to_dict()
+    return u
 
 
 @bp.before_app_request
