@@ -37,12 +37,6 @@ def login():
         return {'errmsg': str(e)}, 401
 
 
-@bp.route('/user', methods=['GET'])
-def get_user():
-    u = g.current_user.to_dict()
-    return u
-
-
 @bp.before_app_request
 def before_request():
     if request.path == '/check_login' or request.path == '/login':
