@@ -4,8 +4,8 @@
 pip3 install -r requirements.txt
 cp .env.example .env
 flask db init
-flask db upgrade
 flask db migrate
+flask db upgrade
 ```
 ## How to run
 ```

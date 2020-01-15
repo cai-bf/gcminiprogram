@@ -2,21 +2,36 @@
 from app import db
 from sqlalchemy.dialects.mysql import TINYINT
 import datetime
+from app.models.teacher_student import TeacherStudent
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(30), nullable=False)
     openid = db.Column(db.String(128), index=True)
-    identify = db.Column(TINYINT())
-    number = db.Column(db.String(20))
-    school = db.Column(db.String(30))
-    title = db.Column(db.String(30))  # 头衔： 教授，讲师...
+    identify = db.Column(TINYINT(), nullable=False, comment='0:学生, 1:教师')
+    number = db.Column(db.String(20), nullable=False)
+    school_id = db.Column(db.Integer, db.ForeignKey('school.id'))
+    title = db.Column(db.String(30), comment='头衔：教授，讲师, 辅导员...')
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
+    students = db.relationship('User', secondary=TeacherStudent,
+                               primaryjoin=(TeacherStudent.teacher == id),
+                               secondaryjoin=(TeacherStudent.student == id),
+                               backref=db.backref('teacher', lazy='dynamic'), lazy='dynamic')
+
+    competitions = db.relationship('Competition', backref='user', lazy='dynamic')
+
+    teams = db.relationship('Team', backref='user', lazy='dynamic')
+
+    # 我参与的团队
+    involvements = db.relationship('Member', backref='user', lazy='dynamic')
+
+    read = db.relationship('Read', backref='user', lazy='dynamic')
+
     def from_dict(self, data):
-        for field in ['name', 'identify', 'number', 'school', 'title']:
+        for field in ['name', 'identify', 'number', 'school_id', 'title']:
             if field in data:
                 setattr(self, field, data[field])
 
