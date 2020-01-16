@@ -1,5 +1,5 @@
 # coding:utf-8
-from app.controller import bp
+from . import bp
 from flask import g, request, current_app, abort, make_response
 from app.models import user
 from app.utils import auth

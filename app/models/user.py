@@ -30,6 +30,8 @@ class User(db.Model):
 
     read = db.relationship('Read', backref='user', lazy='dynamic')
 
+    messages = db.relationship('Message', backref='user', lazy='dynamic')
+
     def from_dict(self, data):
         for field in ['name', 'identify', 'number', 'school_id', 'title']:
             if field in data:

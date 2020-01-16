@@ -1,5 +1,5 @@
 # coding:utf-8
-from app.controller import bp
+from . import bp
 from flask import g
 
 

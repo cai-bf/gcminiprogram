@@ -14,3 +14,5 @@ class Config(object):
     APP_SECRET = os.environ.get('APP_SECRET')
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+    IMG_BASE_URL = os.environ.get('IMG_BASE_URL')
