@@ -19,11 +19,12 @@ def create_message():
     data = request.get_json()
     schema = {
         'content': {'type': 'string'},
-        'pic': {'type': 'list'}
+        'pic': {'type': 'list', 'required': False}
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errmsg': 400}, 400
-    images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, data['pic']))
+    images = data['pic'] if data.get('pic') is not None else []
+    images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
     try:
         msg = Message(content=data['content'], pic=dumps(images), user=user)
         db.session.add(msg)
