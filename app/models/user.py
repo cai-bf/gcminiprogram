@@ -2,23 +2,29 @@
 from app import db
 from sqlalchemy.dialects.mysql import TINYINT
 import datetime
-from app.models.teacher_student import TeacherStudent
+
+
+teacherStudent = db.Table(
+    'teacher_student',
+    db.Column('teacher', db.Integer, db.ForeignKey('user.id')),
+    db.Column('student', db.Integer, db.ForeignKey('user.id'))
+)
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), nullable=False)
+    name = db.Column(db.String(30))
     openid = db.Column(db.String(128), index=True)
-    identify = db.Column(TINYINT(), nullable=False, comment='0:学生, 1:教师')
-    number = db.Column(db.String(20), nullable=False)
+    identify = db.Column(TINYINT(), comment='0:学生, 1:教师')
+    number = db.Column(db.String(20))
     school_id = db.Column(db.Integer, db.ForeignKey('school.id'))
     title = db.Column(db.String(30), comment='头衔：教授，讲师, 辅导员...')
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    students = db.relationship('User', secondary=TeacherStudent,
-                               primaryjoin=(TeacherStudent.teacher == id),
-                               secondaryjoin=(TeacherStudent.student == id),
+    students = db.relationship('User', secondary=teacherStudent,
+                               primaryjoin=(teacherStudent.c.teacher == id),
+                               secondaryjoin=(teacherStudent.c.student == id),
                                backref=db.backref('teacher', lazy='dynamic'), lazy='dynamic')
 
     competitions = db.relationship('Competition', backref='user', lazy='dynamic')
@@ -43,10 +49,10 @@ class User(db.Model):
             'name': self.name,
             'identify': self.identify,
             'number': self.number,
-            'school': self.school,
+            'school': self.school.to_dict(),
             'title': self.title,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         }
 
 

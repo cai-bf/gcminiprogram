@@ -9,3 +9,9 @@ class School(db.Model):
     member = db.relationship('Member', backref='school', lazy='dynamic')
 
     user = db.relationship('User', backref='school', lazy='dynamic')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }

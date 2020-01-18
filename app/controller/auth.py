@@ -10,7 +10,7 @@ from wechatpy import WeChatClient
 def check_login():
     token = request.headers.get('access_token')
     if token is None:
-        return {'errmsg': '请先登录'}, 401
+        return {'errmsg': '未登录'}, 401
     data = auth.decode_auth_token(token)
     if data == -1 or data == -2:
         return {'errmsg': '请重新登录'}, 401
@@ -31,7 +31,7 @@ def login():
         u = user.check_user_by_openid(openid)
         if u is None:
             u = user.create_user(openid)
-        token = auth.encode_auth_token(u.id)
+        token = auth.encode_auth_token(u.id, 6)
         return {'access_token': token}
     except Exception as e:
         return {'errmsg': str(e)}, 401

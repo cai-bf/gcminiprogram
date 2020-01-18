@@ -14,3 +14,8 @@ python3 xyt.py
 (prod)
 use gunicorn
 ```
+
+## Generate token for develop
+```
+flask init_token
+```

@@ -4,10 +4,10 @@ import jwt
 from flask import current_app
 
 
-def encode_auth_token(user_id):
+def encode_auth_token(user_id, days):
     try:
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=6),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=days),
             'iat': datetime.datetime.utcnow(),
             'iss': 'xyt',
             'data': {
