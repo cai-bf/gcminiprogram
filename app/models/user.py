@@ -2,6 +2,7 @@
 from app import db
 from sqlalchemy.dialects.mysql import TINYINT
 import datetime
+from .message import Message
 
 
 teacherStudent = db.Table(
@@ -54,6 +55,9 @@ class User(db.Model):
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         }
+
+    def get_messages(self, page, per_page=10):
+        return self.messages.order_by(Message.created_at.desc()).paginate(page, per_page, error_out=False)
 
 
 def create_user(openid):

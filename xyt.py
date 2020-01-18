@@ -13,6 +13,7 @@ from app.utils.auth import encode_auth_token
 
 app = create_app()
 
+
 @app.cli.command('init_token')
 def init_token():
     u1 = User(name='辅导员一号', openid='qwewqeqweqwe', identify=1, number='123456', title='辅导员')
