@@ -74,7 +74,7 @@ def check_user_by_id(id_):
 
 
 def check_user_by_openid(openid):
-    u = User.query().filter_by(openid=openid).first()
+    u = User.query.filter_by(openid=openid).first()
     return u
 
 
