@@ -22,7 +22,7 @@ def login():
     wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'],
                       session=current_app.wx_session)
     # wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'])
-    js_code = request.form.get('jscode')
+    js_code = request.get_json().get('jscode')
     if js_code is None:
         return {'errmsg': '出错， 请重试'}, 401
     try:
