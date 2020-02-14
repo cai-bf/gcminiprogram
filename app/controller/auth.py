@@ -32,7 +32,7 @@ def login():
         if u is None:
             u = user.create_user(openid)
         token = auth.encode_auth_token(u.id, 6)
-        return {'access_token': token}
+        return {'access_token': '{}'.format(token)}
     except Exception as e:
         return {'errmsg': str(e)}, 401
 
