@@ -8,3 +8,4 @@ from . import auth
 from . import user
 from . import message
 from . import attachment
+from . import school
