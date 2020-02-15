@@ -8,7 +8,7 @@ from wechatpy import WeChatClient
 
 @bp.route('/check_login', methods=['GET'])
 def check_login():
-    token = request.headers.get('access_token')
+    token = request.headers.get('Authorization')
     if token is None:
         return {'errmsg': '未登录'}, 401
     data = auth.decode_auth_token(token)
@@ -32,7 +32,7 @@ def login():
         if u is None:
             u = user.create_user(openid)
         token = auth.encode_auth_token(u.id, 6)
-        return {'access_token': str(token, encoding='utf-8')}
+        return {'Authorization': str(token, encoding='utf-8')}
     except Exception as e:
         return {'errmsg': str(e)}, 401
 
@@ -41,7 +41,7 @@ def login():
 def before_request():
     if request.path == '/check_login' or request.path == '/login':
         return
-    token = request.headers.get('access_token')
+    token = request.headers.get('Authorization')
     if token is None:
         abort(make_response({'errmsg': '还没有登录哦'}, 401))
     data = auth.decode_auth_token(token)
