@@ -10,11 +10,11 @@ from wechatpy import WeChatClient
 def check_login():
     token = request.headers.get('Authorization')
     if token is None:
-        return {'errmsg': '未登录'}, 401
+        return {'errmsg': '未登录', 'errcode': 401}, 401
     data = auth.decode_auth_token(token)
     if data == -1 or data == -2:
-        return {'errmsg': '请重新登录'}, 401
-    return {'errmsg': '身份验证成功'}, 200
+        return {'errmsg': '请重新登录', 'errcode': 401}, 401
+    return {'errmsg': '身份验证成功', 'errcode': 200}, 200
 
 
 @bp.route('/login', methods=['POST'])
@@ -24,7 +24,7 @@ def login():
     # wx = WeChatClient(current_app.config['APPID'], current_app.config['APP_SECRET'])
     js_code = request.get_json().get('jscode')
     if js_code is None:
-        return {'errmsg': '出错， 请重试'}, 401
+        return {'errmsg': '参数缺失，请重试', 'errcode': 400}, 400
     try:
         data = wx.wxa.code_to_session(js_code)
         openid = data['openid']
@@ -34,7 +34,7 @@ def login():
         token = auth.encode_auth_token(u.id, 6)
         return {'Authorization': str(token, encoding='utf-8')}
     except Exception as e:
-        return {'errmsg': str(e)}, 401
+        return {'errmsg': str(e), 'errcode': 401}, 401
 
 
 @bp.before_app_request
@@ -43,9 +43,9 @@ def before_request():
         return
     token = request.headers.get('Authorization')
     if token is None:
-        abort(make_response({'errmsg': '还没有登录哦'}, 401))
+        abort(make_response({'errmsg': '还没有登录哦', 'errcode': 401}, 401))
     data = auth.decode_auth_token(token)
     if data == -1 or data == -2:
-        abort(make_response({'errmsg': '还没有登录哦'}, 401))
+        abort(make_response({'errmsg': '还没有登录哦', 'errcode': 401}, 401))
     g.current_user = user.check_user_by_id(data['id'])
 
