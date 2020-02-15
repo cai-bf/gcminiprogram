@@ -9,6 +9,7 @@ class Member(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     school_id = db.Column(db.Integer, db.ForeignKey('school.id'))
+    name = db.Column(db.String(30), nullable=False)
     grade = db.Column(db.String(10), nullable=False)
     number = db.Column(db.String(20), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
