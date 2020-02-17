@@ -36,7 +36,7 @@ def set_info():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '更新个人信息成功', 'errcode': 200}, 200
 
-# 教师认证（感觉这种方法不太行）
+# 教师认证
 @bp.route('/user/certification', methods=['POST'])
 def certificate_teacher():
     u = g.current_user

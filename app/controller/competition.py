@@ -3,7 +3,8 @@ from . import bp
 from flask import g, request, current_app
 from app import db
 from json import dumps
-from app.models import competition, user
+from app.models.user import User
+from app.models.competition import Competition
 from cerberus import Validator
 from datetime import datetime
 
@@ -50,7 +51,7 @@ def create_competition():
     images = data['poster'] if data.get('poster') is not None else []
     images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
     try:
-        c=competition.Competition(
+        c=Competition(
             user=u,
             min_num=data['min_num'],
             max_num=data['max_num'],
@@ -67,19 +68,42 @@ def create_competition():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '发布比赛成功', 'errcode': 200}, 200
 
-
-
-@bp.route('/competition', methods=['GET'])
+@bp.route('/competitions', methods=['GET'])
 def get_competition():
-    pass
+    title = request.args.get('title')
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    if title is None:
+        c = Competition.query.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+    else:
+        c = Competition.query.flter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+    return {
+        'items': [val.to_dict() for val in c.items],
+        'has_next': c.has_next,
+        'has_prev': c.has_prev,
+        'page': c.page,
+        'pages': c.pages,
+        'per_page': c.per_page,
+        'prev_num': c.prev_num,
+        'next_num': c.next_num,
+        'total': c.total
+    }, 200
 
-
-@bp.route('/competition/self', methods=['GET'])
-def get_self_competition():
+@bp.route('/competitions/my', methods=['GET'])
+def get_my_competition():
     u = g.current_user
-    if u.identify == 0:
-        return {'errmsg': '没有权限发布比赛', 'errcode': 403}, 403
-    
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    c = u.competition.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+    return {
+        'items': [val.to_dict() for val in c.items],
+        'has_next': c.has_next,
+        'has_prev': c.has_prev,
+        'page': c.page,
+        'pages': c.pages,
+        'per_page': c.per_page,
+        'prev_num': c.prev_num,
+        'next_num': c.next_num,
+        'total': c.total
+    }, 200
 
-
-    pass

@@ -8,17 +8,18 @@ from cerberus import Validator
 from datetime import datetime
 
 
-V=Validator()
-V.allow_unknown=True
+V = Validator()
+V.allow_unknown = True
 
+# 创建战队
 @bp.route('/team', methods=['POST'])
 def create_team():
     u = g.current_user
-    data=request.get_json()
+    data = request.get_json()
     schema = {
         'teamname': {'type': 'string'},
         'num': {'type': 'integer'},
-        'opinion': {'type': 'integer','required': False},
+        'opinion': {'type': 'integer', 'required': False},
         'demand': {'type': 'integer', 'required': False},
         'poster': {'type': 'list'},
         'competition_id': {'type': 'integer'},
@@ -32,7 +33,8 @@ def create_team():
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
     images = data['poster'] if data.get('poster') is not None else []
-    images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
+    images = list(
+        map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
     s = school.School.query.get(data['school_id'])
     c = competition.Competition.query.get(data['competition_id'])
     if s is None or c is None:
@@ -48,7 +50,7 @@ def create_team():
             competition=c
         )
         db.session.add(t)
-        db.session.commit()
+        db.session.flush()
         m = member.Member(
             team=t,
             user=u,
@@ -66,15 +68,11 @@ def create_team():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '创建战队成功', 'errcode': 200}, 200
 
-@bp.route('/team', methods=['GET'])
-def get_team():
-
-    pass
-
+# 加入
 @bp.route('/team/join', methods=['POST'])
 def join_team():
     u = g.current_user
-    data=request.get_json()
+    data = request.get_json()
     schema = {
         'team_id': {'type': 'integer'},
         'name': {'type': 'string'},
@@ -83,7 +81,7 @@ def join_team():
         'number': {'type': 'string'},
         'phone': {'type': 'string'},
         'mail': {'type': 'string'},
-        'remark':{'type':'string','required': False}
+        'remark': {'type': 'string', 'required': False}
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
@@ -110,13 +108,11 @@ def join_team():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '加入战队申请成功', 'errcode': 200}, 200
 
-    pass
-
-
+# 直接报名
 @bp.route('/team/direct', methods=['POST'])
 def create_team_direct():
     u = g.current_user
-    data=request.get_json()
+    data = request.get_json()
     schema = {
         'teamname': {'type': 'string'},
         'num': {'type': 'integer'},
@@ -145,7 +141,8 @@ def create_team_direct():
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
     images = data['poster'] if data.get('poster') is not None else []
-    images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
+    images = list(
+        map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
     s = school.School.query.get(data['school_id'])
     c = competition.Competition.query.get(data['competition_id'])
     if s is None or c is None:
@@ -158,8 +155,7 @@ def create_team_direct():
             competition=c
         )
         db.session.add(t)
-        db.session.commit()
-
+        db.session.flush()
         l = member.Member(
             team=t,
             user=u,
@@ -194,3 +190,80 @@ def create_team_direct():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '创建战队成功', 'errcode': 200}, 200
 
+# 竞赛所有战队
+@bp.route('/teams/<int:competition_id>', methods=['GET'])
+def get_teams(competition_id):
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    t = team.Team.query.filter_by(competition_id=competition_id).order_by(team.Team.created_at.desc()).paginate(page, per_page, error_out=False)
+    return {
+        'items': [val.to_dict() for val in t.items],
+        'has_next': t.has_next,
+        'has_prev': t.has_prev,
+        'page': t.page,
+        'pages': t.pages,
+        'per_page': t.per_page,
+        'prev_num': t.prev_num,
+        'next_num': t.next_num,
+        'total': t.total
+    }, 200
+
+# 单个战队
+@bp.route('/team/<int:team_id>', methods=['GET'])
+def get_team(team_id):
+    t = team.Team.query.get(team_id)
+    if t is None:
+        return {'errmsg': '此战队不存在', 'errcode': 404}, 404
+    return t.to_dict(), 200
+
+@bp.route('/team', methods=['GET'])
+def get_team():
+    name = request.args.get('name')
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    if title is None:
+        return {'errmsg': '参数错误', 'errcode': 400}, 400
+    else:
+        t = team.Team.query.filter(team.Team.name.like("%"+name+"%")).order_by(team.Team.created_at.desc()).paginate(page, per_page, error_out=False)
+    return {
+        'items': [val.to_dict() for val in t.items],
+        'has_next': t.has_next,
+        'has_prev': t.has_prev,
+        'page': t.page,
+        'pages': t.pages,
+        'per_page': t.per_page,
+        'prev_num': t.prev_num,
+        'next_num': t.next_num,
+        'total': t.total
+    }, 200
+
+
+# 获取成员列表
+@bp.route('/team/<int:team_id>/members', methods=['GET'])
+def get_members(team_id):
+    t = team.Team.query.get(team_id)
+    if t is None:
+        return {'errmsg': '此战队不存在', 'errcode': 404}, 404
+    return {'members': t.get_members()}, 200
+
+
+# 队员申请通过
+@bp.route('/team/<int:team_id>/approve/<member_id>', methods=['PUT', 'POST'])
+def approve_teammate(team_id, member_id):
+    u = g.current_user
+    t = team.Team.query.get(team_id)
+    if t is None:
+        return {'errmsg': '此战队不存在', 'errcode': 404}, 404
+    if t.user_id != u.id:
+        return {'errmsg': '没有权限', 'errcode': 403}, 403
+    m = member.Member.query.get(member_id)
+    if m is None:
+        return {'errmsg': '此队员不存在', 'errcode': 404}, 404
+    if m.team_id != t.id:
+        return {'errmsg': '此队员不属于该战队', 'errcode': 403}, 404
+    try:
+        m.approved = 1
+        db.session.commit()
+    except:
+        return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
+    return {'errmsg': '通过成功', 'errcode': 200}, 200

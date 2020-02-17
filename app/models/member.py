@@ -19,3 +19,21 @@ class Member(db.Model):
     approved = db.Column(TINYINT(), default=0, comment='0：未通过，1：通过')
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+    def to_dict(self):
+        return {
+            'id':self.id,
+            'user_id':self.user_id,
+            'team_id':self.team_id,
+            'school_id':self.school.to_dict(),
+            'name':self.name,
+            'grade':self.grade,
+            'number':self.number,
+            'phone':self.phone,
+            'mail':self.mail,
+            'identify':self.identify,
+            'remark':self.remark,
+            'approved':self.approved,
+            'created_at':self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at':self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+        }

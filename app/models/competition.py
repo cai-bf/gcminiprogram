@@ -21,8 +21,8 @@ class Competition(db.Model):
 
     teams = db.relationship('Team', backref='competition', lazy='dynamic')
 
-    def to_dict():
-        data = {
+    def to_dict(self):
+        return {
             'id': self.id,
             'user': self.user.to_dict(),
             'title': self.title,
@@ -36,4 +36,3 @@ class Competition(db.Model):
             'poster': loads(self.poster),
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
-    return data
