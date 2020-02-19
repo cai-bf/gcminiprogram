@@ -217,11 +217,11 @@ def get_team(team_id):
     return t.to_dict(), 200
 
 @bp.route('/team', methods=['GET'])
-def get_team():
+def search_team():
     name = request.args.get('name')
     page = request.args.get('page', 1, type=int)
     per_page = 10
-    if title is None:
+    if name is None:
         return {'errmsg': '参数错误', 'errcode': 400}, 400
     else:
         t = team.Team.query.filter(team.Team.name.like("%"+name+"%")).order_by(team.Team.created_at.desc()).paginate(page, per_page, error_out=False)
