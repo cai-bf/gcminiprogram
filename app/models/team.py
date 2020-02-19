@@ -1,6 +1,7 @@
 # coding:utf-8
 from app import db
 import datetime
+from json import loads
 
 
 class Team(db.Model):
@@ -14,28 +15,25 @@ class Team(db.Model):
     poster = db.Column(db.String(255))
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
     members = db.relationship('Member', backref='team', lazy='dynamic')
-
 
     def get_members(self):
         mlist = self.members
         return [m.to_dict() for m in mlist]
-    
+
     def to_dict(self):
         return {
-            'id':self.id,
-            'name':self.name,
-            'user_id':self.user_id,
-            'num':self.num,
-            'opinion':self.opinion,
-            'demand':self.demand,
-            'success':self.success,
-            'poster':self.poster,
+            'id': self.id,
+            'name': self.name,
+            'user_id': self.user_id,
+            'num': self.num,
+            'opinion': self.opinion,
+            'demand': self.demand,
+            'success': self.success,
+            'poster': loads(self.poster),
             'competition_id': self.competition.to_dict(),
-            'created_at':self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at':self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
-    
-    

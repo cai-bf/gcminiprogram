@@ -47,6 +47,7 @@ def certificate_teacher():
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
+    
     key = current_app.config['CERTIFICATION_KEY']
     if key != data['key']:
         return {'errmsg': '认证码错误，请重新检查', 'errcode': 400}, 400

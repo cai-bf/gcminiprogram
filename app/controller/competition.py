@@ -70,10 +70,14 @@ def create_competition():
 
 @bp.route('/competitions', methods=['GET'])
 def get_competition():
+    u = g.current_user
+    my = request.args.get('my', False, type=bool)
     title = request.args.get('title')
     page = request.args.get('page', 1, type=int)
     per_page = 10
-    if title is None:
+    if my:
+        c = u.competition.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+    elif title is None:
         c = Competition.query.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
     else:
         c = Competition.query.flter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
@@ -89,21 +93,21 @@ def get_competition():
         'total': c.total
     }, 200
 
-@bp.route('/competitions/my', methods=['GET'])
-def get_my_competition():
-    u = g.current_user
-    page = request.args.get('page', 1, type=int)
-    per_page = 10
-    c = u.competition.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
-    return {
-        'items': [val.to_dict() for val in c.items],
-        'has_next': c.has_next,
-        'has_prev': c.has_prev,
-        'page': c.page,
-        'pages': c.pages,
-        'per_page': c.per_page,
-        'prev_num': c.prev_num,
-        'next_num': c.next_num,
-        'total': c.total
-    }, 200
+# @bp.route('/competitions/my', methods=['GET'])
+# def get_my_competition():
+#     u = g.current_user
+#     page = request.args.get('page', 1, type=int)
+#     per_page = 10
+#     c = u.competition.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+#     return {
+#         'items': [val.to_dict() for val in c.items],
+#         'has_next': c.has_next,
+#         'has_prev': c.has_prev,
+#         'page': c.page,
+#         'pages': c.pages,
+#         'per_page': c.per_page,
+#         'prev_num': c.prev_num,
+#         'next_num': c.next_num,
+#         'total': c.total
+#     }, 200
 

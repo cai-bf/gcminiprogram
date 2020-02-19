@@ -34,6 +34,5 @@ class Member(db.Model):
             'identify':self.identify,
             'remark':self.remark,
             'approved':self.approved,
-            'created_at':self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at':self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+
         }

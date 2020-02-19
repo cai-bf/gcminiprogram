@@ -44,8 +44,8 @@ def create_team():
             name=data['teamname'],
             user=u,
             num=data['num'],
-            opinion=data['opinion'],
-            demand=data['demand'],
+            opinion=data.get('opinion'),
+            demand=data.get('demand'),
             poster=dumps(images),
             competition=c
         )
@@ -100,7 +100,7 @@ def join_team():
             phone=data['phone'],
             mail=data['mail'],
             identify=1,
-            remark=data['remark'],
+            remark=data.get('remark'),
         )
         db.session.add(m)
         db.session.commit()
@@ -216,6 +216,7 @@ def get_team(team_id):
         return {'errmsg': '此战队不存在', 'errcode': 404}, 404
     return t.to_dict(), 200
 
+# 搜索战队
 @bp.route('/team', methods=['GET'])
 def search_team():
     name = request.args.get('name')
