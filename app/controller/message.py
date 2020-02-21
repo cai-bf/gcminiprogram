@@ -68,6 +68,20 @@ def get_messages():
         return {'errmsg': '教师辅导员无该数据', 'errcode': 403}, 403
     page = request.args.get('page', 1, type=int)
     teacher = user.teacher.first()
+
+    if teacher is None:
+        return {
+           'items': [],
+           'has_next': None,
+           'has_prev': None,
+           'page': 1,
+           'pages': 0,
+           'per_page': 10,
+           'prev_num': 0,
+           'next_num': 0,
+           'total': 0
+       }, 200
+
     msg = teacher.get_messages(page)
     return {
         'items': [val.to_dict(user.id) for val in msg.items],
