@@ -18,6 +18,8 @@ V.allow_unknown = True
 @bp.route('/messages', methods=['POST'])
 def create_message():
     user = g.current_user
+    if user.identify is None:
+        return {'errmsg': '请先认证后再发布通知', 'errcode': 403}, 403
     if user.identify == 0:
         return {'errmsg': '没有权限发布通知', 'errcode': 403}, 403
     data = request.get_json()

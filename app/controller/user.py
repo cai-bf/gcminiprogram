@@ -6,7 +6,8 @@ from app.models import user, school, member
 from cerberus import Validator
 
 V = Validator()
-#V.allow_unknown = True
+# V.allow_unknown = True
+
 
 @bp.route('/user', methods=['GET'])
 def get_user():
@@ -22,7 +23,7 @@ def set_info():
         'name': {'type': 'string'},
         'number': {'type': 'string'},
         'school_id': {'type': 'integer'},
-        'title':{'type':'string','required': False}
+        'title': {'type': 'string', 'required': False}
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
@@ -35,6 +36,7 @@ def set_info():
     except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '更新个人信息成功', 'errcode': 200}, 200
+
 
 # 教师认证
 @bp.route('/user/certification', methods=['POST'])
@@ -57,6 +59,7 @@ def certificate_teacher():
     except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '教师认证成功', 'errcode': 200}, 200 
+
 
 @bp.route('/user/identify', methods=['POST'])
 def identify():
