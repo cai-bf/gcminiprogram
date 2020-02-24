@@ -120,7 +120,8 @@ def read(msg_id):
 
 @bp.route('/export_read')
 def export():
-    msg_id = request.args.get('id')
+    data = request.get_json();
+    msg_id = data.get('id')
     if msg_id is None:
         return {'errmsg': '参数缺失，请重试', 'errcode': 400}, 400
     user = g.current_user
