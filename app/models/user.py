@@ -50,7 +50,7 @@ class User(db.Model):
             'name': self.name,
             'identify': self.identify,
             'number': self.number,
-            'school': self.school.to_dict(),
+            'school': None if self.school is None else self.school.to_dict(),
             'title': self.title,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S')

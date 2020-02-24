@@ -70,7 +70,7 @@ def identify():
         'identify': {'type': 'integer', 'allowed': [0, 1]},
         'number': {'type': 'string', 'required': True, 'minlength': 6, 'maxlength': 12},
         'title': {'type': 'string', 'required': False},
-        'school_id': {'type': 'integer', 'required': True}
+        'school_id': {'type': 'integer', 'required': True, 'min': 1}
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
