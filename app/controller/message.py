@@ -120,7 +120,6 @@ def read(msg_id):
 
 @bp.route('/export_read')
 def export():
-    # data = request.get_json();
     msg_id = request.args.get('id')
     if msg_id is None:
         return {'errmsg': '参数缺失，请重试', 'errcode': 400}, 400
@@ -156,3 +155,19 @@ def export():
     if mime_tuple[1] is not None:
         response.headers['Content-Encoding'] = mime_tuple[1]
     return response
+
+
+@bp.route('/messages/<int:id>', methods=['DELETE'])
+def del_message(id):
+    user = g.current_user
+    if user.identify != 1:  # 判断教师身份
+        return {'errmsg': '学生无权限删除消息', 'errcode': 403}, 403
+    msg = user.messages.filter_by(id=id).first()
+    if msg is None:
+        return {'errmsg': '该消息不存在或无权限删除该消息', 'errcode': 403}, 403
+
+    for r in msg.reads.all():
+        db.session.delete(r)
+    db.session.delete(msg)
+    db.session.commit()
+    return {'errmsg': '删除成功', 'errcode': 200}, 200
