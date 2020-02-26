@@ -39,7 +39,7 @@ def login():
 
 @bp.before_app_request
 def before_request():
-    if request.path == '/check_login' or request.path == '/login':
+    if request.path == '/check_login' or request.path == '/login' or request.path == '/debug/login':
         return
     token = request.headers.get('Authorization')
     if token is None:
@@ -49,3 +49,12 @@ def before_request():
         abort(make_response({'errmsg': '还没有登录哦', 'errcode': 401}, 401))
     g.current_user = user.check_user_by_id(data['id'])
 
+
+@bp.route('/debug/login', methods=['POST'])
+def debug_login():
+    identity = request.get_json().get('identity')
+    if identity == 'student':
+        token = auth.encode_auth_token(4, 6)
+    else:
+        token = auth.encode_auth_token(3, 6)
+    return {'Authorization': str(token, encoding='utf-8')}
