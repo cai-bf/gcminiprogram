@@ -102,6 +102,9 @@ def get_messages():
 def read(msg_id):
     user = g.current_user
     msg = Message.query.get(msg_id)
+    if msg is None:
+        return {'errmsg': '不存在该消息或已被删除', 'errcode': 400}, 400
+
     teacher = msg.user
 
     if user.identify != 0 or user.teacher.first().id != teacher.id:
