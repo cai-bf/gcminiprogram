@@ -23,6 +23,11 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
+    
+    __table_args__ = (
+        db.UniqueConstraint('number', 'school_id', name='uix_number_school'),
+    )
+
     students = db.relationship('User', secondary=teacherStudent,
                                primaryjoin=(teacherStudent.c.teacher == id),
                                secondaryjoin=(teacherStudent.c.student == id),

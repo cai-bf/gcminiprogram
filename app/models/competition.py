@@ -19,7 +19,7 @@ class Competition(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    teams = db.relationship('Team', backref='competition', lazy='dynamic')
+    teams = db.relationship('Team', backref='competition', lazy='dynamic', cascade='all, delete-orphan', passive_deletes=True)
 
     def to_dict(self):
         return {

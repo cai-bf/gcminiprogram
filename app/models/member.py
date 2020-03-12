@@ -6,7 +6,7 @@ import datetime
 
 class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     school_id = db.Column(db.Integer, db.ForeignKey('school.id'))
     name = db.Column(db.String(30), nullable=False)
@@ -34,5 +34,4 @@ class Member(db.Model):
             'identify':self.identify,
             'remark':self.remark,
             'approved':self.approved,
-
         }

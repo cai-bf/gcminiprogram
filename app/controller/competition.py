@@ -53,6 +53,7 @@ def create_competition():
     try:
         c=Competition(
             user=u,
+            title=data['title'],
             min_num=data['min_num'],
             max_num=data['max_num'],
             apply_start=data['apply_start'],
@@ -69,7 +70,7 @@ def create_competition():
     return {'errmsg': '发布比赛成功', 'errcode': 200}, 200
 
 @bp.route('/competitions', methods=['GET'])
-def get_competition():
+def get_competitions():
     u = g.current_user
     my = request.args.get('my', False, type=bool)
     title = request.args.get('title')
@@ -80,7 +81,7 @@ def get_competition():
     elif title is None:
         c = Competition.query.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
     else:
-        c = Competition.query.flter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+        c = Competition.query.filter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
     return {
         'items': [val.to_dict() for val in c.items],
         'has_next': c.has_next,
@@ -93,21 +94,20 @@ def get_competition():
         'total': c.total
     }, 200
 
-# @bp.route('/competitions/my', methods=['GET'])
-# def get_my_competition():
-#     u = g.current_user
-#     page = request.args.get('page', 1, type=int)
-#     per_page = 10
-#     c = u.competition.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
-#     return {
-#         'items': [val.to_dict() for val in c.items],
-#         'has_next': c.has_next,
-#         'has_prev': c.has_prev,
-#         'page': c.page,
-#         'pages': c.pages,
-#         'per_page': c.per_page,
-#         'prev_num': c.prev_num,
-#         'next_num': c.next_num,
-#         'total': c.total
-#     }, 200
+
+
+@bp.route('/competition/<int:competition_id>', methods=['DELETE'])
+def delete_competition(competition_id):
+    u = g.current_user
+    c = Competition.query.get(competition_id)
+    if c is None:
+        return {'errmsg': '此比赛不存在', 'errcode': 404}, 404
+    if u != c.user:
+        return {'errmsg': '非大赛创建者', 'errcode': 403}, 403
+    try:
+        db.session.delete(c)
+        db.session.commit()
+    except:
+        return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
+    return {'errmsg': '删除比赛成功', 'errcode': 200}, 200
 

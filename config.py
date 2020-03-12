@@ -17,3 +17,4 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
     IMG_BASE_URL = os.environ.get('IMG_BASE_URL')
+    CERTIFICATION_KEY = os.environ.get('CERTIFICATION_KEY')
