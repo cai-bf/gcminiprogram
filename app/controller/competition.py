@@ -3,7 +3,6 @@ from . import bp
 from flask import g, request, current_app
 from app import db
 from json import dumps
-from app.models.user import User
 from app.models.competition import Competition
 from cerberus import Validator
 from datetime import datetime
@@ -25,16 +24,16 @@ def to_date(s):
     return datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
 
 
-V=MyValidator()
-V.allow_unknown=True
+V = MyValidator()
+V.allow_unknown = True
 
 
-@bp.route('/competition', methods = ['POST'])
+@bp.route('/competition', methods=['POST'])
 def create_competition():
     u = g.current_user
     if u.identify == 0:
         return {'errmsg': '没有权限发布比赛', 'errcode': 403}, 403
-    data=request.get_json()
+    data = request.get_json()
     schema = {
         'title': {'type': 'string'},
         'min_num': {'type': 'integer'},
@@ -51,7 +50,7 @@ def create_competition():
     images = data['poster'] if data.get('poster') is not None else []
     images = list(map(lambda x: current_app.config['IMG_BASE_URL'] + x, images))
     try:
-        c=Competition(
+        c = Competition(
             user=u,
             title=data['title'],
             min_num=data['min_num'],
@@ -69,6 +68,7 @@ def create_competition():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '发布比赛成功', 'errcode': 200}, 200
 
+
 @bp.route('/competitions', methods=['GET'])
 def get_competitions():
     u = g.current_user
@@ -81,7 +81,8 @@ def get_competitions():
     elif title is None:
         c = Competition.query.order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
     else:
-        c = Competition.query.filter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc()).paginate(page, per_page, error_out=False)
+        c = Competition.query.filter(Competition.title.like("%"+title+"%")).order_by(Competition.created_at.desc())\
+            .paginate(page, per_page, error_out=False)
     return {
         'items': [val.to_dict() for val in c.items],
         'has_next': c.has_next,
@@ -93,7 +94,6 @@ def get_competitions():
         'next_num': c.next_num,
         'total': c.total
     }, 200
-
 
 
 @bp.route('/competition/<int:competition_id>', methods=['DELETE'])
@@ -110,4 +110,3 @@ def delete_competition(competition_id):
     except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '删除比赛成功', 'errcode': 200}, 200
-

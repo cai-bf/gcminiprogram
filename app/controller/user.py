@@ -9,6 +9,8 @@ from cerberus import Validator
 import datetime
 
 V = Validator()
+
+
 # V.allow_unknown = True
 
 
@@ -16,6 +18,7 @@ V = Validator()
 def get_user():
     u = g.current_user.to_dict()
     return u
+
 
 # 完善个人信息与辅导员认证
 @bp.route('/user/identify', methods=['POST'])
@@ -28,7 +31,7 @@ def set_info():
         'number': {'type': 'string', 'required': True, 'minlength': 6, 'maxlength': 12},
         'title': {'type': 'string', 'required': False},
         'school_id': {'type': 'integer', 'required': True, 'min': 1},
-        'key': {'type': 'string', 'required': False,'dependencies': {'identify': 1}}
+        'key': {'type': 'string', 'required': False, 'dependencies': {'identify': 1}}
     }
     if V.validate(data, schema) is False:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
@@ -43,12 +46,13 @@ def set_info():
         data.pop('key')
         user.update_user(u, data)
         if data['identify'] == 0:
-            Member.query.filter_by(number=data['number']).update({'user_id':u.id})
+            Member.query.filter_by(number=data['number']).update({'user_id': u.id})
     except Exception as e:
         if user.User.query.filter_by(school_id=data['school_id'], number=data['number']).first() is not None:
             return {'errmsg': '该校该学号已注册', 'errcode': 403}, 403
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '更新个人信息成功', 'errcode': 200}, 200
+
 
 @bp.route('/user/formid', methods=['POST'])
 def store_form_id():
@@ -56,7 +60,31 @@ def store_form_id():
     data = request.get_json()
     if data.get('form_id') is None:
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
-    weekday=datetime.date.today().weekday()
+    weekday = datetime.date.today().weekday()
     current_app.redis.zset('form_id' + str(weekday), str(u.id) + "_" + data.get('form_id'), u.id)
     current_app.redis.expire('form_id' + str(weekday), 3600 * 24 * 7)
     return {'errmsg': '存储成功', 'errcode': 200}, 200
+
+
+@bp.route('/user/bind_students', methods=['POST'])
+def bind():
+    u = g.current_user
+    if u.identify != 1:  # 非教师
+        return {'errmsg': '没有权限执行该操作', 'errcode': 400}, 400
+    data = request.get_json()
+    res = []
+    already = []
+    for number in data['numbers']:
+        stu = user.User.query.filter_by(number=number).first()
+        if stu is None:
+            res.append(number)
+        elif stu.teacher.first() is not None:
+            already.append(number)
+        else:
+            u.students.append(stu)
+    db.session.add(u)
+    db.session.commit()
+    if res == [] and already == []:
+        return {'errmsg': '绑定学生成功', 'errcode': 200}, 200
+    return {'errmsg': '以下学生尚未注册： ' + ("，".join(res) if res else '无') + ' ' + '以下学生以绑定过教师： ' +
+                      "，".join(already) if already else '无', 'errcode': 200}, 200
