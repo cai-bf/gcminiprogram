@@ -11,8 +11,10 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'iuyasfiush*^*k3w2rkasfas'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4'.format(os.environ.get('DB_USER'),
             os.environ.get('DB_PWD'), os.environ.get('DB_HOST'), os.environ.get('DB_PORT'), os.environ.get('DB_NAME'))
-    APPID = os.environ.get('APP_ID')
-    APP_SECRET = os.environ.get('APP_SECRET')
+    APP_MINI_ID = os.environ.get('APP_ID')
+    APP_MINI_SECRET = os.environ.get('APP_SECRET')
+    APP_ID = os.environ.get('APP_SERVICE_ID')
+    APP_SECRET = os.environ.get('APP_SERVICE_SECRET')
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')

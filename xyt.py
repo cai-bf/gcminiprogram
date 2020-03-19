@@ -7,6 +7,7 @@ from app.models.team import Team
 from app.models.member import Member
 from app.models.message import Message
 from app.models.read import Read
+from app.models.follower import Follower
 import datetime
 from app.utils.auth import encode_auth_token
 import random

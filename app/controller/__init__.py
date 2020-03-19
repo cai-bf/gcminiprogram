@@ -11,3 +11,4 @@ from . import attachment
 from . import school
 from . import competition
 from . import team
+from . import wechat

@@ -23,6 +23,8 @@ def create_app(config_class=Config):
 
     app.redis = Redis.from_url(app.config['REDIS_URL'])
 
+    app.wx_mini_session = RedisStorage(app.redis, "wechatpymini")
+
     app.wx_session = RedisStorage(app.redis)
 
     return app
