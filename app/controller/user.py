@@ -5,8 +5,11 @@ from app import db
 from app.models import user
 from app.models.school import School
 from app.models.member import Member
+from app.models.captcha import Captcha
 from cerberus import Validator
 import datetime
+import random
+from sqlalchemy.exc import IntegrityError
 
 V = Validator()
 
@@ -37,34 +40,25 @@ def set_info():
         return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
     if School.query.get(data['school_id']) is None:
         return {'errmsg': '学校id出错，请重新检查', 'errcode': 400}, 400
-    if data['identify'] == 1 and data.get('key') is None:
-        return {'errmsg': '无授权码', 'errcode': 400}, 400
-    key = current_app.config['CERTIFICATION_KEY']
-    if data['identify'] == 1 and key != data['key']:
-        return {'errmsg': '认证码错误，请重新检查', 'errcode': 403}, 403
+
+    if data['identify'] == 1:
+        if data.get('key') is None:
+            return {'errmsg': '无授权码', 'errcode': 400}, 400
+        captcha = Captcha.query.filter_by(deleted=0, code=data.get('key').upper()).first()
+        if captcha is None:
+            return {'errmsg': '认证码错误，请重新检查', 'errcode': 403}, 403
+         
     try:
         data.pop('key')
+        captcha.deleted = 1
         user.update_user(u, data)
         if data['identify'] == 0:
             Member.query.filter_by(number=data['number']).update({'user_id': u.id})
-    except Exception as e:
-        if user.User.query.filter_by(school_id=data['school_id'], number=data['number']).first() is not None:
-            return {'errmsg': '该校该学号已注册', 'errcode': 403}, 403
+    except IntegrityError:
+        return {'errmsg': '该校该学号已注册', 'errcode': 403}, 403
+    except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '更新个人信息成功', 'errcode': 200}, 200
-
-
-@bp.route('/user/formid', methods=['POST'])
-def store_form_id():
-    u = g.current_user
-    data = request.get_json()
-    if data.get('form_id') is None:
-        return {'errmsg': '参数出错，请重新检查', 'errcode': 400}, 400
-    weekday = datetime.date.today().weekday()
-    current_app.redis.zset('form_id' + str(weekday), str(u.id) + "_" + data.get('form_id'), u.id)
-    current_app.redis.expire('form_id' + str(weekday), 3600 * 24 * 7)
-    return {'errmsg': '存储成功', 'errcode': 200}, 200
-
 
 @bp.route('/user/bind_students', methods=['POST'])
 def bind():
@@ -88,3 +82,22 @@ def bind():
         return {'errmsg': '绑定学生成功', 'errcode': 200}, 200
     return {'errmsg': '以下学生尚未注册： ' + ("，".join(res) if res else '无') + ' ' + '以下学生以绑定过教师： ' +
                       "，".join(already) if already else '无', 'errcode': 200}, 200
+
+@bp.route('/user/new_captcha', methods=['GET'])
+def new_captcha():
+    key = request.args.get('key')
+    if key is None:
+        return {'errmsg': 'no key', 'errcode': 403}, 403
+    if key != current_app.config['CERTIFICATION_KEY']:
+        return {'errmsg': 'uncorrect key', 'errcode': 403}, 403
+    
+    l1 = [str(i) for i in range(10)]
+    l2 = [chr(i) for i in range(65, 91)]
+    code = ''.join(random.sample(l1 + l2, 6))
+    try:
+        c = Captcha(code=code)
+        db.session.add(c)
+        db.session.commit()
+    except:
+        return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
+    return {'code': code}, 200
