@@ -15,6 +15,8 @@ def send_template(teacher_id, msg_id):
     msg = Message.query.get(msg_id)
     teacher = user.check_user_by_id(teacher_id)
     for stu in teacher.students.all():
+        if stu.follower is None:
+            continue
         wx.message.send_template(stu.follower.openid, app.config['MSG_TEMPLATE_ID'],  {
             "first": {
                 "value": stu.name + '同学, 你有一条新的通知',
