@@ -19,7 +19,7 @@ def wechat_event():
 
     data = request.data
     msg = parse_message(data)
-    if msg.type == 'subscribe':
+    if msg.type == 'event' and msg.event == 'subscribe':
         if Follower.query.filter_by(openid=msg.source).first() is None:
             wx = WeChatClient(current_app.config['APP_ID'], current_app.config['APP_SECRET'],
                               session=current_app.wx_session)
