@@ -34,7 +34,7 @@ def wechat_event():
 def check_signature(data, signature):
     data.sort()
     tmp = ''.join(data)
-    tmp = hashlib.sha1(tmp)
+    tmp = hashlib.sha1(tmp.encode('utf-8')).hexdigest()
     if tmp == signature:
         return True
     return False
