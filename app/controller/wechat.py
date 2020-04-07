@@ -10,12 +10,12 @@ import hashlib
 @bp.route('/wechat', methods=['POST', 'GET'])
 def wechat_event():
     # 初次接入验证
-    sign = request.args.get('signature')
-    timestamp = request.args.get('timestamp')
-    nonce = request.args.get('nonce')
-    if check_signature(['fsdf3432csaQQWWEE', timestamp, nonce], sign):
-        return request.args.get('echostr')
-    return request.args.get('echostr')
+    # sign = request.args.get('signature')
+    # timestamp = request.args.get('timestamp')
+    # nonce = request.args.get('nonce')
+    # if check_signature(['token', timestamp, nonce], sign):
+    #    return request.args.get('echostr')
+    # return request.args.get('echostr')
 
     data = request.data
     msg = parse_message(data)
