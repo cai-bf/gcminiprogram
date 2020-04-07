@@ -9,6 +9,7 @@ from app.models.read import Read
 import xlwt
 from io import BytesIO
 import mimetypes
+from app.utils import task
 
 
 V = Validator()
@@ -20,7 +21,7 @@ def create_message():
     user = g.current_user
     if user.identify is None:
         return {'errmsg': '请先认证后再发布通知', 'errcode': 403}, 403
-    if user.identify == 0:
+    if user.identify == 0:  # 非教师
         return {'errmsg': '没有权限发布通知', 'errcode': 403}, 403
     data = request.get_json()
     schema = {
@@ -38,7 +39,9 @@ def create_message():
         db.session.commit()
     except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
-    return {'errmsg': '发布消息成功', 'errcode': 200}, 200
+    # 后台任务队列推送模板消息
+    current_app.rq.enqueue(task.send_template, user.id, msg.id)
+    return {'errmsg': '发布消息成功, 正在推送至学生微信中', 'errcode': 200}, 200
 
 
 # 辅导员接口

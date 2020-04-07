@@ -3,6 +3,7 @@ from app import db
 from sqlalchemy.dialects.mysql import TINYINT
 import datetime
 from .message import Message
+from .follower import Follower
 
 
 teacherStudent = db.Table(
@@ -16,6 +17,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     openid = db.Column(db.String(128), index=True)
+    unionid = db.Column(db.String(128))
     identify = db.Column(TINYINT(), comment='0:学生, 1:教师')
     number = db.Column(db.String(20))
     school_id = db.Column(db.Integer, db.ForeignKey('school.id'))
@@ -31,6 +33,11 @@ class User(db.Model):
                                primaryjoin=(teacherStudent.c.teacher == id),
                                secondaryjoin=(teacherStudent.c.student == id),
                                backref=db.backref('teacher', lazy='dynamic'), lazy='dynamic')
+
+    # follower指用户对应的follower信息
+    follower = db.relationship('Follower', backref='user', uselist=False,
+                               foreign_keys=[unionid],
+                               primaryjoin=(unionid == Follower.unionid))
 
     competitions = db.relationship('Competition', backref='user', lazy='dynamic')
 

@@ -1,6 +1,6 @@
 # coding:utf-8
 from . import bp
-from flask import g, request, current_app
+from flask import request, current_app
 from app import db
 from app.models.follower import Follower
 from wechatpy import parse_message, WeChatClient

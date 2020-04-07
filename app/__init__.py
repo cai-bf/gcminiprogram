@@ -5,6 +5,7 @@ from config import Config
 from redis import Redis
 from wechatpy.session.redisstorage import RedisStorage
 from flask_migrate import Migrate
+from rq import Queue
 
 
 db = SQLAlchemy()
@@ -26,5 +27,7 @@ def create_app(config_class=Config):
     app.wx_mini_session = RedisStorage(app.redis, "wechatpymini")
 
     app.wx_session = RedisStorage(app.redis)
+
+    app.rq = Queue(connection=app.redis, name='xyt-queue')
 
     return app

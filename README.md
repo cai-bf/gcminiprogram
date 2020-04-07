@@ -9,6 +9,8 @@ flask db upgrade
 ```
 ## How to run
 ```
+// before run project, run this command
+$ rq worker &
 (dev)
 python3 xyt.py
 (prod)
