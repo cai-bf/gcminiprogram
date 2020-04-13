@@ -28,7 +28,7 @@ def login():
     try:
         data = wx.wxa.code_to_session(js_code)
         openid = data['openid']
-        unionid = data['unionid']
+        unionid = data.get('unionid', None)
         u = user.check_user_by_openid(openid, unionid)
         if u is None:
             u = user.create_user(openid, unionid)

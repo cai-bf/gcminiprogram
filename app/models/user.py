@@ -87,7 +87,7 @@ def check_user_by_id(id_):
 
 def check_user_by_openid(openid, unionid):
     u = User.query.filter_by(openid=openid).first()
-    if u.unionid is None:
+    if u.unionid is None and unionid is not None:
         u.unionid = unionid
         db.session.add(u)
         db.session.commit()
