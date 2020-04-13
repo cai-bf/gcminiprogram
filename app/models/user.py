@@ -85,8 +85,12 @@ def check_user_by_id(id_):
     return u
 
 
-def check_user_by_openid(openid):
+def check_user_by_openid(openid, unionid):
     u = User.query.filter_by(openid=openid).first()
+    if u.unionid is None:
+        u.unionid = unionid
+        db.session.add(u)
+        db.session.commit()
     return u
 
 
