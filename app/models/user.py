@@ -71,9 +71,10 @@ class User(db.Model):
         return self.messages.order_by(Message.created_at.desc()).paginate(page, per_page, error_out=False)
 
 
-def create_user(openid):
+def create_user(openid, unionid):
     user = User()
     user.openid = openid
+    user.unionid = unionid
     db.session.add(user)
     db.session.commit()
     return user

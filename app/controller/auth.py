@@ -28,9 +28,10 @@ def login():
     try:
         data = wx.wxa.code_to_session(js_code)
         openid = data['openid']
+        unionid = data['unionid']
         u = user.check_user_by_openid(openid)
         if u is None:
-            u = user.create_user(openid)
+            u = user.create_user(openid, unionid)
         token = auth.encode_auth_token(u.id, 6)
         return {'Authorization': str(token, encoding='utf-8')}
     except Exception as e:
