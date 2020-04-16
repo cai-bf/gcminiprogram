@@ -49,8 +49,9 @@ def set_info():
             return {'errmsg': '认证码错误，请重新检查', 'errcode': 403}, 403
          
     try:
-        data.pop('key')
-        captcha.deleted = 1
+        if data['identify'] == 1:
+            data.pop('key')
+            captcha.deleted = 1
         user.update_user(u, data)
         if data['identify'] == 0:
             Member.query.filter_by(number=data['number']).update({'user_id': u.id})
