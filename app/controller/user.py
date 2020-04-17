@@ -61,6 +61,7 @@ def set_info():
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '更新个人信息成功', 'errcode': 200}, 200
 
+
 @bp.route('/user/bind_students', methods=['POST'])
 def bind():
     u = g.current_user
@@ -83,6 +84,7 @@ def bind():
         return {'errmsg': '绑定学生成功', 'errcode': 200}, 200
     return {'errmsg': '以下学生尚未注册： ' + ("，".join(res) if res else '无') + ' ' + '以下学生以绑定过教师： ' +
                       "，".join(already) if already else '无', 'errcode': 200}, 200
+
 
 @bp.route('/user/new_captcha', methods=['GET'])
 def new_captcha():

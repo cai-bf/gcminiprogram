@@ -8,6 +8,7 @@ from .follower import Follower
 
 teacherStudent = db.Table(
     'teacher_student',
+    db.Column('id', db.Integer, primary_key=True),
     db.Column('teacher', db.Integer, db.ForeignKey('user.id')),
     db.Column('student', db.Integer, db.ForeignKey('user.id'))
 )

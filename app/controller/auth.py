@@ -52,11 +52,11 @@ def before_request():
     g.current_user = user.check_user_by_id(data['id'])
 
 
-@bp.route('/debug/login', methods=['POST'])
-def debug_login():
-    identity = request.get_json().get('identity')
-    if identity == 'student':
-        token = auth.encode_auth_token(4, 6)
-    else:
-        token = auth.encode_auth_token(3, 6)
-    return {'Authorization': str(token, encoding='utf-8')}
+# @bp.route('/debug/login', methods=['POST'])
+# def debug_login():
+#     identity = request.get_json().get('identity')
+#     if identity == 'student':
+#         token = auth.encode_auth_token(4, 6)
+#     else:
+#         token = auth.encode_auth_token(3, 6)
+#     return {'Authorization': str(token, encoding='utf-8')}
