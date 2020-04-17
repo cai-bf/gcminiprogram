@@ -146,7 +146,7 @@ def export():
     for stu in user.students.all():
         sheet.write(i, 0, stu.name)
         sheet.write(i, 1, stu.number)
-        sheet.write(i, 2, '是' if msg.reads.filter_by(user_id=stu.id) is not None else '')
+        sheet.write(i, 2, '是' if msg.reads.filter_by(user_id=stu.id).first() is not None else '')
         i += 1
     output = BytesIO()
     f.save(output)
