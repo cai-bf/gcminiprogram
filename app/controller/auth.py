@@ -41,7 +41,7 @@ def login():
 @bp.before_app_request
 def before_request():
     if request.path == '/check_login' or request.path == '/login' or request.path == '/debug/login' \
-            or request.path == '/wechat':
+            or request.path == '/wechat' or request.path == '/user/new_captcha':
         return
     token = request.headers.get('Authorization')
     if token is None:
