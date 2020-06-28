@@ -1,12 +1,15 @@
 # coding:utf-8
 from . import bp
-from flask import g, request, current_app
+from flask import g, request, current_app, Response
 from app import db
 from json import dumps
 from app.models.competition import Competition
+from app.models.team import Team
 from cerberus import Validator
 from datetime import datetime
-
+import xlwt
+from io import BytesIO
+import mimetypes
 
 class MyValidator(Validator):
     def _validate_time_after(self, other, field, value):
@@ -110,3 +113,49 @@ def delete_competition(competition_id):
     except:
         return {'errmsg': '出现错误，请稍后再试～', 'errcode': 500}, 500
     return {'errmsg': '删除比赛成功', 'errcode': 200}, 200
+
+@bp.route('/competition/<int:competition_id>/export')
+def export_competition(competition_id):
+    u = g.current_user
+    c = Competition.query.get(competition_id)
+    if c is None:
+        return {'errmsg': '此比赛不存在', 'errcode': 404}, 404
+    if u.identify == 0:
+        return {'errmsg': '没有权限发布比赛', 'errcode': 403}, 403
+    f = xlwt.Workbook()
+    sheet = f.add_sheet('大赛报名队伍', True)
+    sheet.write_merge(0, 0, 0, 7, c.title)
+    sheet.write(1, 0, '队伍名称')
+    sheet.write(1, 1, '队长')
+    sheet.write(1, 2, '队员姓名')
+    sheet.write(1, 3, '学院')
+    sheet.write(1, 4, '年级')
+    sheet.write(1, 5, '学号')
+    sheet.write(1, 6, '手机')
+    sheet.write(1, 7, '邮箱')
+    i = 2
+    for t in c.teams.all():
+        for m in t.members.all():
+            sheet.write(i, 0, t.name)
+            sheet.write(i, 1, '队长' if m.identify==1 else '')
+            sheet.write(i, 2, m.name)
+            sheet.write(i, 3, m.school.name)
+            sheet.write(i, 4, m.grade)
+            sheet.write(i, 5, m.number)
+            sheet.write(i, 6, m.phone)
+            sheet.write(i, 7, m.mail)
+            i += 1
+    output = BytesIO()
+    f.save(output)
+
+    response = Response()
+    response.status_code = 200
+    response.data = output.getvalue()
+    filename = 'registration_teams.xls'
+    mime_tuple = mimetypes.guess_type(filename)
+    response.headers['Content-Type'] = mime_tuple[0]
+    response.headers['Content-Disposition'] = 'attachment; filename=\"%s\";' % filename
+    if mime_tuple[1] is not None:
+        response.headers['Content-Encoding'] = mime_tuple[1]
+    return response
+    
