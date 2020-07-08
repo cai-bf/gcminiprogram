@@ -30,6 +30,7 @@ class Team(db.Model):
             'name': self.name,
             'user_id': self.user.to_dict(),
             'num': self.num,
+            'approved_num': self.members.filter_by(approved=1).count(),
             'opinion': self.opinion,
             'demand': self.demand,
             'success': self.success,
